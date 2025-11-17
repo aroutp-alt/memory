@@ -17,11 +17,9 @@
       margin: 0;
       min-height: 100vh;
       background: radial-gradient(circle at top, #e0f2fe 0, #f3e8ff 40%, #f9fafb 80%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      font-family: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "Nunito", system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      padding: 20px 12px;
     }
 
     .container {
@@ -34,6 +32,7 @@
       backdrop-filter: blur(10px);
       position: relative;
       overflow: hidden;
+      margin: 0 auto 32px;
     }
 
     header {
@@ -197,7 +196,8 @@
       font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
-      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.1s ease;
+      transition: transform 0.08s ease, box-shadow 0.08s ease,
+        background 0.1s ease;
       font-family: "Nunito", system-ui, -apple-system, sans-serif;
     }
 
@@ -234,7 +234,6 @@
 
     .hidden { display: none; }
 
-    /* 게임 영역 */
     #gamePanel { margin-top: 16px; }
 
     .game-header {
@@ -345,7 +344,6 @@
       grid-template-columns: repeat(4, minmax(110px, 1fr));
     }
 
-    /* 카드 */
     .card {
       position: relative;
       width: 100%;
@@ -422,7 +420,6 @@
       padding: 24px 10px 18px;
     }
 
-    /* 우승 오버레이 */
     .winner-overlay {
       position: absolute;
       inset: 0;
@@ -503,10 +500,13 @@
     }
 
     @media (max-width: 768px) {
-      .container { padding: 16px 14px 20px; }
+      .container {
+        padding: 16px 16px 22px;
+      }
       header h1 { font-size: 1.55rem; }
-      .card { min-height: 110px; }
+      .card { min-height: 100px; }
       .card-back { font-size: 1.2rem; }
+      .grid { gap: 10px; }
     }
   </style>
 </head>
@@ -734,21 +734,7 @@
       return array;
     }
 
-    function buildCards(pairs, setCount) {
-      let idCounter = 0;
-      const tempCards = [];
-
-      pairs.forEach((pair, index) => {
-        const pairId = index;
-        for (let s = 0; s < setCount; s++) {
-          tempCards.push({ id: idCounter++, text: pair.left, pairId, side: "L" });
-          tempCards.push({ id: idCounter++, text: pair.right, pairId, side: "R" });
-        }
-      });
-
-      return shuffle(tempCards);
-    }
-
+    // 카드 수에 맞게, 화면 폭에 맞춰 최소 폭 조정
     function updateGridColumns() {
       const count = cards.length;
       if (!count) return;
@@ -770,7 +756,25 @@
         cols = tmp;
       }
 
-      grid.style.gridTemplateColumns = `repeat(${cols}, minmax(110px, 1fr))`;
+      const isSmall = window.innerWidth <= 600;
+      const minWidth = isSmall ? 90 : 110;
+
+      grid.style.gridTemplateColumns = `repeat(${cols}, minmax(${minWidth}px, 1fr))`;
+    }
+
+    function buildCards(pairs, setCount) {
+      let idCounter = 0;
+      const tempCards = [];
+
+      pairs.forEach((pair, index) => {
+        const pairId = index;
+        for (let s = 0; s < setCount; s++) {
+          tempCards.push({ id: idCounter++, text: pair.left, pairId, side: "L" });
+          tempCards.push({ id: idCounter++, text: pair.right, pairId, side: "R" });
+        }
+      });
+
+      return shuffle(tempCards);
     }
 
     function renderGrid() {
@@ -983,7 +987,6 @@
 
       savedPairs = pairs.slice();
 
-      // 탭 상태: 2단계 활성화
       tabStep1.classList.remove("active");
       tabStep2.classList.add("active");
 
@@ -1002,7 +1005,6 @@
         '<div class="empty-state">위에서 <strong>설정 완료 · 게임 시작</strong>을 먼저 눌러 주세요.</div>';
       showMessage("");
 
-      // 탭 상태: 1단계 활성화
       tabStep1.classList.add("active");
       tabStep2.classList.remove("active");
 
@@ -1010,7 +1012,6 @@
       gamePanel.classList.add("hidden");
     }
 
-    // 이벤트 연결
     setupDoneBtn.addEventListener("click", startGame);
     restartBtn.addEventListener("click", () => {
       if (!savedPairs.length) startGame();
@@ -1028,7 +1029,11 @@
     pairsInput.addEventListener("input", parsePairs);
     setCountInput.addEventListener("input", parsePairs);
 
-    // 최초 1회 쌍/카드 수 계산
+    // 윈도우 크기 바뀔 때도 그리드 다시 계산
+    window.addEventListener("resize", () => {
+      if (cards.length) updateGridColumns();
+    });
+
     parsePairs();
   </script>
 </body>
