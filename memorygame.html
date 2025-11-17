@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>기억력 매칭 게임</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- 폰트 (Jua + Nunito) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #e0f2fe 0, #f3e8ff 40%, #f9fafb 80%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      font-family: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .container {
+      max-width: 1100px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 22px;
+      padding: 20px 24px 26px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      font-family: "Jua", "Nunito", system-ui, -apple-system, sans-serif;
+    }
+
+    header .badge {
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #4f46e5;
+      border: 1px solid #c7d2fe;
+    }
+
+    .subtitle {
+      margin: 0 0 12px;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
+    .pill-tabs {
+      display: inline-flex;
+      gap: 6px;
+      background: #f3f4f6;
+      border-radius: 999px;
+      padding: 3px;
+      margin-bottom: 14px;
+    }
+
+    .pill-tabs span {
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: #6b7280;
+    }
+
+    .pill-tabs .active {
+      background: white;
+      color: #111827;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+    }
+
+    .panel {
+      background: #f9fafb;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      padding: 14px 16px 16px;
+    }
+
+    .panel-title {
+      font-size: 0.96rem;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+
+    .panel-desc {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-bottom: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 160px;
+      resize: vertical;
+      border-radius: 12px;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      background: #ffffff;
+      font-family: "Nunito", system-ui, -apple-system, sans-serif;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 1px #6366f1;
+    }
+
+    .hint-box {
+      font-size: 0.78rem;
+      color: #4b5563;
+      background: #eef2ff;
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-top: 8px;
+      border: 1px dashed #c7d2fe;
+    }
+
+    .hint-box code {
+      background: #e5e7eb;
+      padding: 0 4px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+    }
+
+    .settings-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: #4b5563;
+    }
+
+    .settings-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: #e5e7eb;
+      padding: 4px 8px;
+      border-radius: 999px;
+    }
+
+    .settings-item input[type="number"],
+    .settings-item select {
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      padding: 2px 8px;
+      font-size: 0.8rem;
+      min-width: 58px;
+      background: #ffffff;
+      font-family: "Nunito", system-ui, -apple-system, sans-serif;
+    }
+
+    .settings-footer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    .settings-footer .summary {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e5e7eb;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.1s ease;
+      font-family: "Nunito", system-ui, -apple-system, sans-serif;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      color: white;
+      box-shadow: 0 5px 15px rgba(129, 140, 248, 0.5);
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(129, 140, 248, 0.55);
+    }
+
+    .primary-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 10px rgba(129, 140, 248, 0.5);
+    }
+
+    .ghost-btn {
+      background: transparent;
+      color: #4b5563;
+      border: 1px solid #d1d5db;
+    }
+
+    .ghost-btn:hover {
+      background: #f3f4f6;
+    }
+
+    .small-btn {
+      padding: 4px 10px;
+      font-size: 0.78rem;
+    }
+
+    .hidden { display: none; }
+
+    /* 게임 영역 */
+    #gamePanel { margin-top: 16px; }
+
+    .game-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .turn-pill {
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #4338ca;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: "Jua", "Nunito", system-ui, sans-serif;
+    }
+
+    .turn-pill span.badge-small {
+      background: white;
+      border-radius: 999px;
+      padding: 2px 7px;
+      border: 1px solid #c7d2fe;
+      font-size: 0.72rem;
+      font-family: "Nunito", system-ui, -apple-system, sans-serif;
+    }
+
+    .game-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: #6b7280;
+    }
+
+    .game-stats .stat-pill {
+      background: #e5e7eb;
+      border-radius: 999px;
+      padding: 4px 9px;
+    }
+
+    .game-stats .stat-pill span {
+      font-weight: 600;
+      color: #111827;
+      margin-left: 3px;
+    }
+
+    .players-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0 6px;
+      font-size: 0.8rem;
+    }
+
+    .player-pill {
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      color: #374151;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: "Jua", "Nunito", system-ui, sans-serif;
+    }
+
+    .player-pill.active {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+      font-weight: 700;
+    }
+
+    .player-pill .score-badge {
+      background: white;
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 0.75rem;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      font-family: "Nunito", system-ui, -apple-system, sans-serif;
+    }
+
+    .game-toolbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .message {
+      font-size: 0.85rem;
+      min-height: 18px;
+      margin-bottom: 8px;
+    }
+
+    .message.ok { color: #16a34a; }
+    .message.warn { color: #b45309; }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 6px;
+      grid-template-columns: repeat(4, minmax(110px, 1fr));
+    }
+
+    /* 카드 */
+    .card {
+      position: relative;
+      width: 100%;
+      min-height: 120px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.5s ease;
+      transform-style: preserve-3d;
+    }
+
+    .card.flipped .card-inner { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      border: 1px solid #d1d5db;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backface-visibility: hidden;
+      padding: 10px;
+      text-align: center;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      font-size: 1.1rem;
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.12);
+      font-family: "Jua", "Nunito", system-ui, sans-serif;
+    }
+
+    .card-front {
+      background: linear-gradient(145deg, #e5e7eb, #f9fafb);
+      color: #4b5563;
+      font-size: 1.1rem;
+    }
+
+    .card-back {
+      background: linear-gradient(145deg, #fef3c7, #fffbeb);
+      color: #111827;
+      transform: rotateY(180deg);
+      font-size: 1.35rem;
+    }
+
+    .card.matched .card-back {
+      background: linear-gradient(145deg, #bbf7d0, #ecfdf5);
+      border-color: #16a34a;
+      box-shadow: 0 10px 20px rgba(22, 163, 74, 0.28);
+    }
+
+    .card.disabled {
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
+    .card:hover .card-inner {
+      transform: translateY(-3px) scale(1.02);
+    }
+
+    .card.flipped:hover .card-inner {
+      transform: rotateY(180deg) translateY(-3px) scale(1.02);
+    }
+
+    .empty-state {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      text-align: center;
+      padding: 24px 10px 18px;
+    }
+
+    /* 우승 오버레이 */
+    .winner-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+    }
+
+    .winner-overlay.show { display: flex; }
+
+    .winner-box {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 24px 26px 20px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.5);
+      text-align: center;
+      position: relative;
+    }
+
+    .winner-title {
+      font-family: "Jua", "Nunito", system-ui, sans-serif;
+      font-size: 1.6rem;
+      margin-bottom: 6px;
+      color: #0f172a;
+    }
+
+    .winner-subtitle {
+      font-size: 0.9rem;
+      color: #4b5563;
+      margin-bottom: 12px;
+    }
+
+    .winner-highlight {
+      font-size: 1.2rem;
+      color: #2563eb;
+      margin-bottom: 8px;
+      font-family: "Jua", "Nunito", system-ui, sans-serif;
+    }
+
+    .winner-scores {
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin-bottom: 14px;
+    }
+
+    .winner-scores span {
+      display: inline-block;
+      margin: 2px 4px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: #f3f4f6;
+    }
+
+    .winner-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .winner-badge {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #f97316, #fde047);
+      color: #7c2d12;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      box-shadow: 0 6px 12px rgba(248, 113, 22, 0.5);
+      font-family: "Jua", "Nunito", system-ui, sans-serif;
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 16px 14px 20px; }
+      header h1 { font-size: 1.55rem; }
+      .card { min-height: 110px; }
+      .card-back { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>기억력 매칭 게임</h1>
+      <div class="badge">학습 단어 · 개념 매칭</div>
+    </header>
+    <p class="subtitle">
+      ① 단어쌍과 세트 수, 플레이어 수를 정한 뒤 <strong>“설정 완료”</strong>을 누르고<br />
+      ② 위에 표시되는 플레이어 순서를 따라 카드를 뒤집어 보세요.
+    </p>
+
+    <div class="pill-tabs">
+      <span class="active" id="tabStep1">1 단계 · 정보 입력</span>
+      <span id="tabStep2">2 단계 · 카드 뒤집기</span>
+    </div>
+
+    <!-- 설정 패널 -->
+    <section id="setupPanel" class="panel">
+      <div class="panel-title">1. 학습 내용 & 설정</div>
+      <div class="panel-desc">
+        한 줄에 하나의 쌍을 적어 주세요. 형식: <strong>앞쪽 - 뒤쪽</strong>
+      </div>
+
+      <textarea id="pairsInput">산소 - 산소캔
+이산화탄소 - 탄산수
+질소 - 과자봉지
+헬륨 - 헬륨풍선</textarea>
+
+      <div class="hint-box">
+        예시<br />
+        - 영어 단어 - 뜻<br />
+        - 개념 - 설명<br />
+        - 문제 - 정답<br />
+        형식: <code>앞 - 뒤</code> (하이픈 앞뒤에 한 칸씩 띄우면 좋습니다)
+      </div>
+
+      <div class="settings-row">
+        <div class="settings-item">
+          세트 수
+          <input type="number" id="setCount" min="1" max="5" value="1" />
+        </div>
+        <div class="settings-item">
+          플레이어 수
+          <select id="playerCount">
+            <option value="2" selected>2명</option>
+            <option value="3">3명</option>
+            <option value="4">4명</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-footer">
+        <button class="primary-btn" id="setupDoneBtn">설정 완료 · 게임 시작</button>
+        <span class="summary">
+          현재 입력: <strong id="pairCount">0</strong>쌍 · 예상 카드:
+          <strong id="cardCount">0</strong>장
+        </span>
+      </div>
+    </section>
+
+    <!-- 게임 패널 -->
+    <section id="gamePanel" class="panel hidden">
+      <div class="game-header">
+        <div class="turn-pill">
+          현재 차례
+          <span class="badge-small" id="playerTurnLabel">P1</span>
+        </div>
+        <div class="game-stats">
+          <div class="stat-pill">시도<span id="moves">0</span></div>
+          <div class="stat-pill">성공 쌍<span id="matches">0</span></div>
+          <div class="stat-pill">시간<span id="time">0</span>초</div>
+          <div class="stat-pill">카드 수<span id="inGameCardCount">0</span></div>
+        </div>
+      </div>
+
+      <div id="playersRow" class="players-row"></div>
+
+      <div class="game-toolbar">
+        <button class="ghost-btn small-btn" id="restartBtn">같은 설정으로 다시하기</button>
+        <button class="ghost-btn small-btn" id="backToSetupBtn">설정 다시 하기</button>
+      </div>
+
+      <div id="message" class="message"></div>
+
+      <div id="grid" class="grid">
+        <div class="empty-state">
+          위에서 <strong>설정 완료 · 게임 시작</strong>을 먼저 눌러 주세요.
+        </div>
+      </div>
+    </section>
+
+    <!-- 우승 오버레이 -->
+    <div id="winnerOverlay" class="winner-overlay">
+      <div class="winner-box">
+        <div class="winner-badge">게임 완료!</div>
+        <div class="winner-title">우승을 축하합니다! 🎉</div>
+        <div class="winner-subtitle">모두 수고했어요 👏</div>
+        <div class="winner-highlight" id="winnerHighlight"></div>
+        <div class="winner-scores" id="winnerScores"></div>
+        <div class="winner-buttons">
+          <button class="primary-btn small-btn" id="winnerRestartBtn">한 번 더 하기</button>
+          <button class="ghost-btn small-btn" id="winnerCloseBtn">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const pairsInput = document.getElementById("pairsInput");
+    const pairCountSpan = document.getElementById("pairCount");
+    const cardCountSpan = document.getElementById("cardCount");
+    const setCountInput = document.getElementById("setCount");
+    const playerCountSelect = document.getElementById("playerCount");
+    const setupPanel = document.getElementById("setupPanel");
+    const gamePanel = document.getElementById("gamePanel");
+    const setupDoneBtn = document.getElementById("setupDoneBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const backToSetupBtn = document.getElementById("backToSetupBtn");
+
+    const grid = document.getElementById("grid");
+    const messageEl = document.getElementById("message");
+    const movesEl = document.getElementById("moves");
+    const matchesEl = document.getElementById("matches");
+    const timeEl = document.getElementById("time");
+    const inGameCardCountEl = document.getElementById("inGameCardCount");
+    const playersRow = document.getElementById("playersRow");
+    const playerTurnLabel = document.getElementById("playerTurnLabel");
+
+    const winnerOverlay = document.getElementById("winnerOverlay");
+    const winnerHighlight = document.getElementById("winnerHighlight");
+    const winnerScores = document.getElementById("winnerScores");
+    const winnerRestartBtn = document.getElementById("winnerRestartBtn");
+    const winnerCloseBtn = document.getElementById("winnerCloseBtn");
+
+    const tabStep1 = document.getElementById("tabStep1");
+    const tabStep2 = document.getElementById("tabStep2");
+
+    let cards = [];
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false;
+    let moves = 0;
+    let matches = 0;
+    let totalPairs = 0;
+    let timer = null;
+    let elapsed = 0;
+
+    let setCount = 1;
+    let playerCount = 2;
+    let currentPlayerIndex = 0;
+    let scores = [];
+    let savedPairs = [];
+
+    function showMessage(text, type = "") {
+      messageEl.textContent = text;
+      messageEl.className = "message";
+      if (type) messageEl.classList.add(type);
+    }
+
+    function resetStats() {
+      moves = 0;
+      matches = 0;
+      elapsed = 0;
+      movesEl.textContent = moves;
+      matchesEl.textContent = matches;
+      timeEl.textContent = elapsed;
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    function startTimer() {
+      if (timer) return;
+      timer = setInterval(() => {
+        elapsed++;
+        timeEl.textContent = elapsed;
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    function parsePairs() {
+      const lines = pairsInput.value
+        .split("\n")
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0);
+
+      const pairs = [];
+
+      for (const line of lines) {
+        let parts = line.split(" - ");
+        if (parts.length === 1) {
+          parts = line.split("-");
+        }
+        if (parts.length < 2) continue;
+
+        const left = parts[0].trim();
+        const right = parts.slice(1).join("-").trim();
+        if (!left || !right) continue;
+
+        pairs.push({ left, right });
+      }
+
+      pairCountSpan.textContent = pairs.length;
+      const sc = parseInt(setCountInput.value, 10) || 1;
+      cardCountSpan.textContent = pairs.length * 2 * sc;
+
+      return pairs;
+    }
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function buildCards(pairs, setCount) {
+      let idCounter = 0;
+      const tempCards = [];
+
+      pairs.forEach((pair, index) => {
+        const pairId = index;
+        for (let s = 0; s < setCount; s++) {
+          tempCards.push({ id: idCounter++, text: pair.left, pairId, side: "L" });
+          tempCards.push({ id: idCounter++, text: pair.right, pairId, side: "R" });
+        }
+      });
+
+      return shuffle(tempCards);
+    }
+
+    function updateGridColumns() {
+      const count = cards.length;
+      if (!count) return;
+
+      let rows = 1;
+      let cols = count;
+
+      for (let r = Math.floor(Math.sqrt(count)); r >= 1; r--) {
+        if (count % r === 0) {
+          rows = r;
+          cols = count / r;
+          break;
+        }
+      }
+
+      if (rows > cols) {
+        const tmp = rows;
+        rows = cols;
+        cols = tmp;
+      }
+
+      grid.style.gridTemplateColumns = `repeat(${cols}, minmax(110px, 1fr))`;
+    }
+
+    function renderGrid() {
+      grid.innerHTML = "";
+      if (!cards.length) {
+        grid.innerHTML =
+          '<div class="empty-state">유효한 쌍이 없습니다.<br>설정을 다시 확인해 주세요.</div>';
+        return;
+      }
+
+      cards.forEach((card) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "card";
+        wrapper.dataset.id = card.id;
+        wrapper.dataset.pairId = card.pairId;
+        wrapper.dataset.side = card.side;
+
+        const inner = document.createElement("div");
+        inner.className = "card-inner";
+
+        const front = document.createElement("div");
+        front.className = "card-face card-front";
+        front.textContent = "?";
+
+        const back = document.createElement("div");
+        back.className = "card-face card-back";
+        back.textContent = card.text;
+
+        inner.appendChild(front);
+        inner.appendChild(back);
+        wrapper.appendChild(inner);
+        grid.appendChild(wrapper);
+      });
+
+      updateGridColumns();
+    }
+
+    function getCardElementById(id) {
+      return grid.querySelector(`.card[data-id="${id}"]`);
+    }
+
+    function flipCardElement(el, show) {
+      if (!el) return;
+      if (show) el.classList.add("flipped");
+      else el.classList.remove("flipped");
+    }
+
+    function initPlayers() {
+      playerCount = parseInt(playerCountSelect.value, 10) || 2;
+      scores = Array(playerCount).fill(0);
+      currentPlayerIndex = 0;
+      renderPlayers();
+      updatePlayerTurnLabel();
+    }
+
+    function renderPlayers() {
+      playersRow.innerHTML = "";
+      scores.forEach((score, idx) => {
+        const div = document.createElement("div");
+        div.className = "player-pill";
+        if (idx === currentPlayerIndex) div.classList.add("active");
+        const label = document.createElement("span");
+        label.textContent = `P${idx + 1}`;
+        const scoreBadge = document.createElement("span");
+        scoreBadge.className = "score-badge";
+        scoreBadge.textContent = `${score}쌍`;
+        div.appendChild(label);
+        div.appendChild(scoreBadge);
+        playersRow.appendChild(div);
+      });
+    }
+
+    function updatePlayerTurnLabel() {
+      playerTurnLabel.textContent = `P${currentPlayerIndex + 1}`;
+      const pills = playersRow.querySelectorAll(".player-pill");
+      pills.forEach((pill, i) => {
+        pill.classList.toggle("active", i === currentPlayerIndex);
+      });
+    }
+
+    function addScoreForCurrentPlayer() {
+      scores[currentPlayerIndex]++;
+      renderPlayers();
+    }
+
+    function nextPlayer() {
+      currentPlayerIndex = (currentPlayerIndex + 1) % playerCount;
+      updatePlayerTurnLabel();
+    }
+
+    function resetTurn() {
+      [firstCard, secondCard] = [null, null];
+      lockBoard = false;
+    }
+
+    function showWinner() {
+      let maxScore = Math.max(...scores);
+      const winners = scores
+        .map((s, i) => ({ s, i }))
+        .filter((p) => p.s === maxScore)
+        .map((p) => `P${p.i + 1}`);
+
+      if (winners.length === 1) {
+        winnerHighlight.textContent = `${winners[0]} 우승! 🎉 (${maxScore}쌍)`;
+      } else {
+        winnerHighlight.textContent = `공동 우승! 🎉 (${winners.join(", ")} · ${maxScore}쌍)`;
+      }
+
+      winnerScores.innerHTML = "";
+      scores.forEach((s, i) => {
+        const span = document.createElement("span");
+        span.textContent = `P${i + 1} : ${s}쌍`;
+        winnerScores.appendChild(span);
+      });
+
+      winnerOverlay.classList.add("show");
+    }
+
+    function hideWinner() {
+      winnerOverlay.classList.remove("show");
+    }
+
+    function onCardClick(e) {
+      const target = e.target.closest(".card");
+      if (!target) return;
+      if (target.classList.contains("matched")) return;
+      if (lockBoard) return;
+
+      const cardId = Number(target.dataset.id);
+      const card = cards.find((c) => c.id === cardId);
+      if (!card) return;
+
+      if (firstCard && firstCard.id === card.id) return;
+
+      if (moves === 0 && !firstCard && !secondCard) startTimer();
+
+      flipCardElement(target, true);
+
+      if (!firstCard) {
+        firstCard = card;
+        return;
+      }
+
+      secondCard = card;
+      lockBoard = true;
+      moves++;
+      movesEl.textContent = moves;
+
+      const firstEl = getCardElementById(firstCard.id);
+      const secondEl = getCardElementById(secondCard.id);
+
+      const isMatch =
+        firstCard.pairId === secondCard.pairId &&
+        firstCard.side !== secondCard.side;
+
+      if (isMatch) {
+        setTimeout(() => {
+          firstEl.classList.add("matched", "disabled");
+          secondEl.classList.add("matched", "disabled");
+
+          matches++;
+          matchesEl.textContent = matches;
+          addScoreForCurrentPlayer();
+
+          showMessage(`P${currentPlayerIndex + 1}, 한 쌍을 맞췄어요! 👏`, "ok");
+          resetTurn();
+
+          if (matches === totalPairs && totalPairs > 0) {
+            stopTimer();
+            showMessage(`전체 완료! (시도: ${moves}번, 시간: ${elapsed}초)`, "ok");
+            showWinner();
+          }
+        }, 280);
+      } else {
+        showMessage(`P${currentPlayerIndex + 1} 틀렸어요. 다음 플레이어 차례! 🙂`, "warn");
+        setTimeout(() => {
+          flipCardElement(firstEl, false);
+          flipCardElement(secondEl, false);
+          resetTurn();
+          nextPlayer();
+        }, 700);
+      }
+    }
+
+    function buildGameFromSaved() {
+      if (!savedPairs.length) return;
+
+      resetStats();
+      hideWinner();
+      initPlayers();
+
+      totalPairs = savedPairs.length * setCount;
+      cards = buildCards(savedPairs, setCount);
+      inGameCardCountEl.textContent = cards.length;
+      renderGrid();
+      showMessage("카드를 눌러서 같은 쌍을 찾아보세요!", "ok");
+    }
+
+    function startGame() {
+      const pairs = parsePairs();
+      setCount = parseInt(setCountInput.value, 10) || 1;
+      if (setCount < 1) setCount = 1;
+      if (setCount > 5) setCount = 5;
+      setCountInput.value = setCount;
+
+      if (!pairs.length) {
+        alert("유효한 단어쌍이 없습니다. 최소 1쌍 이상 입력해 주세요.");
+        return;
+      }
+
+      savedPairs = pairs.slice();
+
+      // 탭 상태: 2단계 활성화
+      tabStep1.classList.remove("active");
+      tabStep2.classList.add("active");
+
+      setupPanel.classList.add("hidden");
+      gamePanel.classList.remove("hidden");
+
+      buildGameFromSaved();
+    }
+
+    function backToSetup() {
+      stopTimer();
+      resetStats();
+      hideWinner();
+      cards = [];
+      grid.innerHTML =
+        '<div class="empty-state">위에서 <strong>설정 완료 · 게임 시작</strong>을 먼저 눌러 주세요.</div>';
+      showMessage("");
+
+      // 탭 상태: 1단계 활성화
+      tabStep1.classList.add("active");
+      tabStep2.classList.remove("active");
+
+      setupPanel.classList.remove("hidden");
+      gamePanel.classList.add("hidden");
+    }
+
+    // 이벤트 연결
+    setupDoneBtn.addEventListener("click", startGame);
+    restartBtn.addEventListener("click", () => {
+      if (!savedPairs.length) startGame();
+      else buildGameFromSaved();
+    });
+    backToSetupBtn.addEventListener("click", backToSetup);
+
+    winnerRestartBtn.addEventListener("click", () => {
+      hideWinner();
+      buildGameFromSaved();
+    });
+    winnerCloseBtn.addEventListener("click", hideWinner);
+
+    grid.addEventListener("click", onCardClick);
+    pairsInput.addEventListener("input", parsePairs);
+    setCountInput.addEventListener("input", parsePairs);
+
+    // 최초 1회 쌍/카드 수 계산
+    parsePairs();
+  </script>
+</body>
+</html>
